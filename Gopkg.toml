@@ -7,3 +7,7 @@
   branch = "master"
   name = "github.com/brutella/hc"
 
+
+[[constraint]]
+  name = "github.com/stianeikeland/go-rpio"
+  version = "^4.2.0"
