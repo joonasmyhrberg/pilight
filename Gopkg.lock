@@ -67,6 +67,14 @@
   version = "v1.0.12"
 
 [[projects]]
+  digest = "1:5d38c0b7e011b2dfb108eecccd4966dacd488ab2070b7d10952c77b909309349"
+  name = "github.com/stianeikeland/go-rpio"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "019f406b4939d0ac8fb6801637506f0e2fe872d3"
+  version = "4.2.0"
+
+[[projects]]
   branch = "master"
   digest = "1:4203ff9f9475785fe17a29ce1f4e72098d770606a14b6559e8ddc3bd3f579f5e"
   name = "github.com/tadglines/go-pkgs"
@@ -124,6 +132,7 @@
     "github.com/brutella/hc/accessory",
     "github.com/brutella/hc/characteristic",
     "github.com/brutella/hc/service",
+    "github.com/stianeikeland/go-rpio",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
