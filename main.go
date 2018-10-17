@@ -6,8 +6,14 @@ import (
 
 	"github.com/brutella/hc"
 	hcAccessory "github.com/brutella/hc/accessory"
+	"github.com/brutella/hc/characteristic"
 	"github.com/joonasmyhrberg/pilight/accessory"
 	rpio "github.com/stianeikeland/go-rpio"
+)
+
+const (
+	minColorTemperature = 154
+	maxColorTemperature = 370
 )
 
 func main() {
@@ -33,9 +39,9 @@ func main() {
 	}
 
 	ledStrip := accessory.NewWhiteLightbulb(info)
-	ledStrip.WhiteSpectrumBulb.ColorTemperature.SetMinValue(154)
-	ledStrip.WhiteSpectrumBulb.ColorTemperature.SetMaxValue(370)
-	ledStrip.WhiteSpectrumBulb.ColorTemperature.SetValue(262)
+	ledStrip.WhiteSpectrumBulb.ColorTemperature.SetMinValue(minColorTemperature)
+	ledStrip.WhiteSpectrumBulb.ColorTemperature.SetMaxValue(maxColorTemperature)
+	ledStrip.WhiteSpectrumBulb.ColorTemperature.SetValue(minColorTemperature)
 	ledStrip.WhiteSpectrumBulb.On.SetValue(false)
 
 	config := hc.Config{}
@@ -44,26 +50,16 @@ func main() {
 		log.Panic(err)
 	}
 
-	brightness := 0
-
 	ledStrip.WhiteSpectrumBulb.On.OnValueRemoteUpdate(func(on bool) {
-		if on {
-			coolLEDPin.DutyCycle(uint32(brightness), 100)
-			warmLEDPin.DutyCycle(uint32(brightness), 100)
-		} else {
-			coolLEDPin.DutyCycle(0, 100)
-			warmLEDPin.DutyCycle(0, 100)
-		}
+		setDuty(ledStrip, &coolLEDPin, &warmLEDPin)
 	})
 
 	ledStrip.WhiteSpectrumBulb.Brightness.OnValueRemoteUpdate(func(newBrightness int) {
-		brightness = newBrightness
-		coolLEDPin.DutyCycle(uint32(brightness), 100)
-		warmLEDPin.DutyCycle(uint32(brightness), 100)
+		setDuty(ledStrip, &coolLEDPin, &warmLEDPin)
 	})
 
 	ledStrip.WhiteSpectrumBulb.ColorTemperature.OnValueRemoteUpdate(func(colorTemperature int) {
-		log.Println("Color Temperature", colorTemperature)
+		setDuty(ledStrip, &coolLEDPin, &warmLEDPin)
 	})
 
 	hc.OnTermination(func() {
@@ -71,4 +67,33 @@ func main() {
 	})
 
 	t.Start()
+}
+
+func setDuty(bulb *accessory.WhiteSpectrumBulb, coolLEDPin *rpio.Pin, warmLEDPin *rpio.Pin) {
+
+	if bulb.WhiteSpectrumBulb.On.GetValue() {
+
+		brightnessMultiplier := bulb.WhiteSpectrumBulb.Brightness.GetValue()
+		warmDutyMultiplier := getBalance(bulb.WhiteSpectrumBulb.ColorTemperature)
+		coolDutyMultiplier := 1.0 - warmDutyMultiplier
+
+		warmDuty := 100 * warmDutyMultiplier * float64(brightnessMultiplier) / 100.0
+		coolDuty := 100 * coolDutyMultiplier * float64(brightnessMultiplier) / 100.0
+
+		warmLEDPin.DutyCycle(uint32(warmDuty), 100)
+		coolLEDPin.DutyCycle(uint32(coolDuty), 100)
+	} else {
+		coolLEDPin.DutyCycle(0, 100)
+		warmLEDPin.DutyCycle(0, 100)
+	}
+}
+
+// getBalance maps the possible colorBalance values to a number between 0 and 1.
+// This is the multiplier for the warm LED brightness.
+func getBalance(colorTemperature *characteristic.ColorTemperature) float64 {
+
+	min := colorTemperature.GetMinValue()
+	max := colorTemperature.GetMaxValue()
+	current := colorTemperature.GetValue()
+	return float64(current-min) / float64(max-min)
 }
