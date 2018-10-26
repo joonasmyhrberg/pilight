@@ -8,5 +8,5 @@ It will work as-is on Raspberry Pi 3 when the cool light to is connected to pin 
 
 Cross compiling with Raspbian: `GOARM=7 GOARCH=arm GOOS=linux go build`
 
-For the PWM to work, `pilight` must be run as sudo.
+For the PWM to work, `pilight` must be run with sudo.
 
