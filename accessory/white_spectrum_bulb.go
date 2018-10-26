@@ -2,7 +2,7 @@ package accessory
 
 import (
 	"github.com/brutella/hc/accessory"
-	"github.com/joonasmyhrberg/pilight/service"
+	"github.com/myyra/pilight/service"
 )
 
 // WhiteSpectrumBulb is a Lightbulb accessory with one WhiteSpectrumBulb service

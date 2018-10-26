@@ -7,7 +7,7 @@ import (
 	"github.com/brutella/hc"
 	hcAccessory "github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
-	"github.com/joonasmyhrberg/pilight/accessory"
+	"github.com/myyra/pilight/accessory"
 	rpio "github.com/stianeikeland/go-rpio"
 )
 
