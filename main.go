@@ -16,6 +16,10 @@ const (
 	maxColorTemperature = 370
 )
 
+const (
+	cycle = 100
+)
+
 func main() {
 
 	err := rpio.Open()
@@ -80,11 +84,11 @@ func setDuty(bulb *accessory.WhiteSpectrumBulb, coolLEDPin *rpio.Pin, warmLEDPin
 		warmDuty := 100 * warmDutyMultiplier * float64(brightnessMultiplier) / 100.0
 		coolDuty := 100 * coolDutyMultiplier * float64(brightnessMultiplier) / 100.0
 
-		warmLEDPin.DutyCycle(uint32(warmDuty), 100)
-		coolLEDPin.DutyCycle(uint32(coolDuty), 100)
+		warmLEDPin.DutyCycle(uint32(warmDuty), cycle)
+		coolLEDPin.DutyCycle(uint32(coolDuty), cycle)
 	} else {
-		coolLEDPin.DutyCycle(0, 100)
-		warmLEDPin.DutyCycle(0, 100)
+		coolLEDPin.DutyCycle(0, cycle)
+		warmLEDPin.DutyCycle(0, cycle)
 	}
 }
 
